@@ -1,50 +1,63 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
-// Demo echo API - replace with n8n webhook proxy in production
+const N8N_WEBHOOK_URL =
+  process.env.N8N_WEBHOOK_URL ||
+  'https://n8n.granizm.net/webhook/349e7c90-1f46-488d-81f8-3cb5cdfeb029/chat';
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const messages = body.messages || [];
   const lastMessage = messages[messages.length - 1];
 
   if (!lastMessage) {
-    return NextResponse.json({ error: 'No message' }, { status: 400 });
+    return new Response('No message', { status: 400 });
   }
 
   const userInput = lastMessage.content as string;
+  const sessionId = body.sessionId || `session-${Date.now()}`;
 
-  // Demo responses
-  const responses: Record<string, string> = {
-    hello: 'こんにちは！Chat Widget のデモへようこそ。何かお手伝いできますか？',
-    help: 'このチャットウィジェットは @anthropic-chat/widget で構築されています。テーマ、ラベル、コンポーネントをカスタマイズできます。',
-  };
+  // Call n8n Chat Trigger
+  const n8nRes = await fetch(N8N_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'sendMessage',
+      sessionId,
+      chatInput: userInput,
+    }),
+  });
 
-  const lower = userInput.toLowerCase().trim();
-  const reply =
-    responses[lower] ||
-    `Echo: ${userInput}\n\nこれはデモ応答です。本番では n8n Chat Trigger の webhook URL に接続してください。`;
+  if (!n8nRes.ok) {
+    const errText = await n8nRes.text();
+    console.error('n8n error:', n8nRes.status, errText);
+    return new Response(`n8n error: ${n8nRes.status}`, { status: 502 });
+  }
 
-  // Return streaming-compatible response (Vercel AI SDK format)
+  // n8n may return JSON with "output" field or plain text
+  const contentType = n8nRes.headers.get('content-type') || '';
+  let reply: string;
+
+  if (contentType.includes('application/json')) {
+    const data = await n8nRes.json();
+    // n8n Chat Trigger typically returns { output: "..." }
+    reply = data.output || data.text || data.response || JSON.stringify(data);
+  } else {
+    reply = await n8nRes.text();
+  }
+
+  // Convert to Vercel AI SDK Data Stream format
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      // Simulate streaming by sending chunks
-      const chars = reply.split('');
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < chars.length) {
-          controller.enqueue(encoder.encode(`0:${JSON.stringify(chars[i])}\n`));
-          i++;
-        } else {
-          controller.enqueue(
-            encoder.encode(
-              `e:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`,
-            ),
-          );
-          controller.enqueue(encoder.encode(`d:{"finishReason":"stop"}\n`));
-          controller.close();
-          clearInterval(interval);
-        }
-      }, 20);
+      // Send the full response as a single text chunk
+      controller.enqueue(encoder.encode(`0:${JSON.stringify(reply)}\n`));
+      controller.enqueue(
+        encoder.encode(
+          `e:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`,
+        ),
+      );
+      controller.enqueue(encoder.encode(`d:{"finishReason":"stop"}\n`));
+      controller.close();
     },
   });
 
