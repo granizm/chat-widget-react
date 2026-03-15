@@ -8,10 +8,6 @@ export function ChatWidgetWrapper() {
       webhookUrl="/api/chat"
       theme={{
         userBubbleColor: '#006cff',
-        backgroundColor: '#ffffff',
-        foregroundColor: '#0a0a0a',
-        mutedColor: '#737373',
-        borderColor: '#e5e5e5',
         borderRadius: 16,
       }}
       labels={{
