@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useChat } from 'ai/react';
 import type { UseChatOptions } from 'ai/react';
 import type { CSSProperties, ReactNode } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // ── Types ──
 
@@ -117,6 +119,12 @@ function injectStyles(isDark: boolean) {
     document.head.appendChild(el);
   }
   const tokens = isDark ? DARK_TOKENS : LIGHT_TOKENS;
+  const codeBg = isDark ? '#1a1a1a' : '#f5f5f5';
+  const codeBorder = isDark ? '#333333' : '#e5e5e5';
+  const linkColor = isDark ? '#60a5fa' : '#006cff';
+  const tableBorder = isDark ? '#333333' : '#d4d4d4';
+  const tableStripeBg = isDark ? '#141414' : '#fafafa';
+
   el.textContent = `
     @keyframes cwv-fadeIn { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:translateY(0) } }
     @keyframes cwv-slideUp { from { opacity:0; transform:translateY(16px) scale(0.96) } to { opacity:1; transform:translateY(0) scale(1) } }
@@ -125,6 +133,57 @@ function injectStyles(isDark: boolean) {
     .cwv-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .cwv-scrollbar::-webkit-scrollbar-thumb { background: ${tokens.scrollThumb}; border-radius: 3px; }
     .cwv-scrollbar::-webkit-scrollbar-thumb:hover { background: ${tokens.scrollThumbHover}; }
+
+    /* Markdown styles */
+    .cwv-md { word-break: break-word; }
+    .cwv-md p { margin: 0 0 8px; line-height: 1.7; }
+    .cwv-md p:last-child { margin-bottom: 0; }
+    .cwv-md h1, .cwv-md h2, .cwv-md h3, .cwv-md h4 { margin: 12px 0 6px; font-weight: 600; line-height: 1.3; }
+    .cwv-md h1 { font-size: 1.25em; }
+    .cwv-md h2 { font-size: 1.15em; }
+    .cwv-md h3 { font-size: 1.05em; }
+    .cwv-md strong { font-weight: 600; }
+    .cwv-md em { font-style: italic; }
+    .cwv-md a { color: ${linkColor}; text-decoration: underline; text-underline-offset: 2px; }
+    .cwv-md a:hover { opacity: 0.8; }
+    .cwv-md ul, .cwv-md ol { margin: 4px 0 8px; padding-left: 20px; }
+    .cwv-md li { margin: 2px 0; line-height: 1.6; }
+    .cwv-md code {
+      font-family: "Geist Mono", "SF Mono", Monaco, "Cascadia Code", monospace;
+      font-size: 0.875em;
+      background: ${codeBg};
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid ${codeBorder};
+    }
+    .cwv-md pre {
+      margin: 8px 0;
+      padding: 12px;
+      background: ${codeBg};
+      border: 1px solid ${codeBorder};
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.85em;
+      line-height: 1.5;
+    }
+    .cwv-md pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+    }
+    .cwv-md blockquote {
+      margin: 8px 0;
+      padding: 4px 12px;
+      border-left: 3px solid ${tokens.muted};
+      color: ${tokens.muted};
+    }
+    .cwv-md hr { border: none; border-top: 1px solid ${codeBorder}; margin: 12px 0; }
+    .cwv-md table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 0.9em; }
+    .cwv-md th, .cwv-md td { border: 1px solid ${tableBorder}; padding: 6px 10px; text-align: left; }
+    .cwv-md th { font-weight: 600; background: ${codeBg}; }
+    .cwv-md tr:nth-child(even) { background: ${tableStripeBg}; }
+    .cwv-md img { max-width: 100%; border-radius: 8px; margin: 4px 0; }
   `;
 }
 
@@ -322,11 +381,18 @@ export function ChatWidget({
                         backgroundColor: 'transparent',
                         color: c.fg,
                         padding: 0,
-                        fontSize: 14, lineHeight: 1.7,
-                        wordBreak: 'break-word' as const, whiteSpace: 'pre-wrap' as const,
+                        fontSize: 14,
                       }),
                     }}>
-                      {m.content}
+                      {isUser ? (
+                        m.content
+                      ) : (
+                        <div className="cwv-md">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {m.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
