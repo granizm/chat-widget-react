@@ -12,84 +12,93 @@ export default function Home() {
         padding: 24,
       }}
     >
-      <div
-        style={{
-          textAlign: 'center',
-          color: '#ffffff',
-          maxWidth: 600,
-        }}
-      >
+      <div style={{ textAlign: 'center', maxWidth: 540 }}>
+        {/* Logo / Icon */}
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            border: '1px solid #e5e5e5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px',
+            backgroundColor: '#ffffff',
+          }}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#0a0a0a"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+
         <h1
           style={{
-            fontSize: 48,
-            fontWeight: 700,
-            marginBottom: 16,
-            letterSpacing: '-0.02em',
+            fontSize: 32,
+            fontWeight: 600,
+            marginBottom: 8,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.2,
           }}
         >
-          Chat Widget Demo
+          Chat Widget
         </h1>
+
         <p
           style={{
-            fontSize: 18,
-            opacity: 0.9,
-            lineHeight: 1.6,
-            marginBottom: 32,
+            fontSize: 16,
+            color: '#737373',
+            lineHeight: 1.5,
+            marginBottom: 40,
           }}
         >
-          A modern, customizable chat widget for React.
-          <br />
-          Powered by Vercel AI SDK.
+          A modern chat widget for React, powered by Vercel AI SDK.
         </p>
 
         <div
           style={{
             display: 'flex',
-            gap: 16,
+            gap: 12,
             justifyContent: 'center',
             flexWrap: 'wrap',
           }}
         >
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: 12,
-              padding: '20px 24px',
-              minWidth: 160,
-            }}
-          >
-            <div style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>~20KB</div>
-            <div style={{ fontSize: 13, opacity: 0.8 }}>Gzipped size</div>
-          </div>
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: 12,
-              padding: '20px 24px',
-              minWidth: 160,
-            }}
-          >
-            <div style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>TypeScript</div>
-            <div style={{ fontSize: 13, opacity: 0.8 }}>Full type support</div>
-          </div>
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: 12,
-              padding: '20px 24px',
-              minWidth: 160,
-            }}
-          >
-            <div style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>n8n Ready</div>
-            <div style={{ fontSize: 13, opacity: 0.8 }}>Chat Trigger compatible</div>
-          </div>
+          {[
+            { label: 'Lightweight', desc: '~20KB gzipped' },
+            { label: 'TypeScript', desc: 'Full type support' },
+            { label: 'n8n Ready', desc: 'Chat Trigger compatible' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e5e5',
+                borderRadius: 12,
+                padding: '16px 20px',
+                minWidth: 140,
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>
+                {item.label}
+              </div>
+              <div style={{ fontSize: 13, color: '#737373' }}>{item.desc}</div>
+            </div>
+          ))}
         </div>
 
-        <p style={{ marginTop: 40, fontSize: 14, opacity: 0.7 }}>
-          Click the chat icon in the bottom-right corner to try it out.
+        <p style={{ marginTop: 48, fontSize: 13, color: '#a3a3a3' }}>
+          Click the chat icon in the bottom-right corner to try it.
         </p>
       </div>
 

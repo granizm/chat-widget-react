@@ -7,21 +7,18 @@ export function ChatWidgetWrapper() {
     <ChatWidget
       webhookUrl="/api/chat"
       theme={{
-        primaryColor: '#6366f1',
+        userBubbleColor: '#006cff',
         backgroundColor: '#ffffff',
-        botMessageBackground: '#f1f5f9',
-        botMessageColor: '#1e293b',
-        userMessageColor: '#ffffff',
+        foregroundColor: '#0a0a0a',
+        mutedColor: '#737373',
+        borderColor: '#e5e5e5',
         borderRadius: 16,
-        messageBorderRadius: 16,
       }}
       labels={{
         title: 'AI Assistant',
-        subtitle: 'Powered by Chat Widget',
-        inputPlaceholder: 'メッセージを入力...',
-        sendButtonText: '送信',
-        welcomeMessage: 'こんにちは！何かお手伝いできますか？',
-        typingText: '入力中...',
+        subtitle: 'Powered by n8n',
+        inputPlaceholder: 'Send a message...',
+        welcomeMessage: 'How can I help you today?',
       }}
     />
   );
